@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Private</title>
+<!-- Encrypted country ranking video player. -->
+<style>
+  :root { --bg:#080808; --fg:#fff; --mute:#aaa; --line:#333; --green:#00FD98; --pink:#FD007F; --yellow:#FDEC00; }
+  * { box-sizing:border-box; }
+  [hidden] { display:none !important; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:Arial,sans-serif; }
+  .gate { min-height:100svh; display:flex; align-items:center; justify-content:center; padding:16px; }
+  .gate form { width:100%; max-width:360px; background:#151515; border:1px solid var(--line); border-radius:12px; padding:24px; }
+  .gate h1 { font-size:16px; margin:0 0 16px; }
+  input[type=password] { width:100%; min-height:44px; background:#0b0b0b; color:var(--fg); border:1px solid #333; border-radius:8px; padding:10px 12px; font-size:16px; }
+  button { min-height:44px; background:#1c1c1c; color:var(--fg); border:1px solid #444; border-radius:8px; padding:8px 14px; font-size:14px; cursor:pointer; transition:border-color .15s, background-color .15s, transform .1s; }
+  button:hover { border-color:#777; background:#232323; } button:active { transform:scale(.97); }
+  .gate button { width:100%; margin-top:12px; font-size:15px; }
+  :focus-visible { outline:2px solid #fff; outline-offset:2px; }
+  .msg { color:var(--mute); font-size:13px; margin-top:10px; min-height:1.4em; } .msg.err { color:#ff8a8a; }
+  header { position:relative; display:grid; grid-template-columns:1fr auto; gap:14px 20px; align-items:center; padding:24px clamp(16px,4vw,56px); border-bottom:1px solid var(--line); }
+  header:before { content:""; position:absolute; inset:0 auto 0 0; width:8px; background:linear-gradient(to bottom,var(--green) 0 33.3%,var(--pink) 33.3% 66.6%,var(--yellow) 66.6%); }
+  .brand { min-width:0; }
+  .eyebrow { display:flex; align-items:center; gap:10px; margin-bottom:8px; font:700 12px/1 'Barlow Condensed',Arial,sans-serif; letter-spacing:.18em; }
+  .tag { border:1px solid var(--green); color:var(--green); padding:5px 8px; }
+  #ttl { margin:0; font:normal clamp(28px,5vw,56px)/.95 'Archivo Black',Impact,sans-serif; letter-spacing:-.035em; }
+  .stripes { display:flex; gap:4px; margin-top:12px; }
+  .stripes i { width:42px; height:4px; display:block; }
+  .stripes i:nth-child(1) { background:var(--green); } .stripes i:nth-child(2) { background:var(--pink); } .stripes i:nth-child(3) { background:var(--yellow); }
+  .head-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
+  button { border-radius:0; font:700 14px 'Barlow Condensed',Arial,sans-serif; letter-spacing:.1em; }
+  .head-actions button { min-width:112px; }
+  #archiveBtn { border-color:var(--pink); color:var(--pink); }
+  #currentBtn { border-color:var(--yellow); color:var(--yellow); }
+  .meta { grid-column:1/-1; color:#ddd; font:700 15px/1.5 'Barlow Condensed',Arial,sans-serif; letter-spacing:.045em; overflow-wrap:anywhere; }
+  .note { grid-column:1/-1; color:var(--mute); font:600 14px/1.4 'Barlow Condensed',Arial,sans-serif; letter-spacing:.04em; }
+  .view-head { display:flex; align-items:center; gap:16px; max-width:1500px; margin:auto; padding:20px; }
+  .view-head h2 { margin:0; font:normal 28px 'Archivo Black',Impact,sans-serif; }
+  .country-switch { display:flex; flex-wrap:wrap; gap:8px; max-width:1500px; margin:0 auto; padding:0 20px 16px; }
+  .country-switch button[aria-current="page"] { border-color:var(--green); color:var(--green); cursor:default; }
+  .archive-list { display:grid; gap:10px; max-width:1500px; margin:0 auto; padding:0 20px 24px; }
+  .archive-row { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:64px; width:100%; text-align:left; border-color:#444; }
+  .archive-title { font:700 16px/1.45 'Barlow Condensed',Arial,sans-serif; letter-spacing:.03em; }
+  .badge { flex:none; padding:7px 9px; color:#000; background:var(--green); font:700 12px 'Barlow Condensed',Arial,sans-serif; letter-spacing:.12em; }
+  .archive-row[data-kind="annual"] .badge { background:var(--yellow); }
+  .empty { color:var(--mute); padding:20px; }
+  main { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; padding:20px; max-width:1500px; margin:0 auto; }
+  .card { background:#151515; border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .card h3 { font:700 18px 'Barlow Condensed',Arial,sans-serif; letter-spacing:.04em; margin:0 0 8px; display:flex; align-items:center; gap:8px; }
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .frame { position:relative; width:100%; aspect-ratio:9/16; background:#000; border-radius:6px; overflow:hidden; }
+  .frame iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+  .ctrl { display:flex; gap:8px; align-items:center; margin-top:10px; }
+  .ctrl input[type=range] { flex:1; min-height:44px; accent-color:#aaa; cursor:pointer; }
+  .pp { min-width:44px; }
+  .t { font-variant-numeric:tabular-nums; font-size:12px; color:var(--mute); min-width:84px; text-align:right; }
+  .info { font:600 14px/1.6 'Barlow Condensed',Arial,sans-serif; color:var(--mute); margin-top:8px; text-wrap:pretty; } .info a { color:var(--green); }
+  .load { color:var(--mute); font-size:13px; padding:20px; text-align:center; }
+  @media (max-width: 820px) {
+    header { grid-template-columns:1fr; padding:18px 16px 18px 24px; } .head-actions { justify-content:flex-start; } .head-actions button { flex:1; }
+    .meta,.note { grid-column:1; }
+    .view-head { padding:16px; }
+    .country-switch { padding:0 16px 16px; }
+    .archive-list { padding:0 16px 24px; }
+    .archive-row { align-items:flex-start; }
+    main { grid-template-columns:1fr; gap:24px; padding:16px; }
+    .card { width:100%; max-width:min(100%, calc((100svh - 200px) * 9 / 16 + 24px)); justify-self:center; }
+  }
+</style>
+</head>
+<body>
+<div class="gate" id="gate">
+  <form id="f" autocomplete="off">
+    <h1>ENTER PASSWORD</h1>
+    <input id="pw" type="password" autocomplete="current-password" aria-label="Password" required>
+    <button type="submit">UNLOCK</button>
+    <div class="msg" id="msg" role="status"></div>
+  </form>
+</div>
+<div id="app" hidden>
+  <header>
+    <div class="brand"><div class="eyebrow"><span class="tag">INTERNAL</span><span>RANKING SERIES</span></div><h1 id="ttl"></h1><div class="stripes" aria-hidden="true"><i></i><i></i><i></i></div></div>
+    <div class="head-actions"><button id="playAll" type="button">▶ PLAY ALL</button><button id="stopAll" type="button">■ STOP ALL</button><button id="archiveBtn" type="button">ARCHIVE</button><button id="currentBtn" type="button" hidden>CURRENT EDITION</button></div>
+    <span class="meta" id="hdr"></span>
+    <span class="note">Tap a video to open its source sheet (Google Drive). No audio.</span>
+  </header>
+  <section id="archiveView" hidden><div class="view-head"><button id="backBtn" type="button">← BACK</button><h2>ARCHIVE</h2></div><nav id="countrySwitch" class="country-switch" aria-label="Switch country"></nav><div id="archiveList" class="archive-list"></div></section>
+  <div class="load" id="load">Preparing videos…</div>
+  <main id="cards"></main>
+</div>
+<script>
+const $ = (s) => document.querySelector(s);
+const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let KEY = null;
+async function dec(path) {
+  const buf = new Uint8Array(await (await fetch(path, { cache: 'no-store' })).arrayBuffer());
+  return crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(0, 12) }, KEY, buf.slice(12));
+}
+$('#f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = $('#msg'); msg.className = 'msg'; msg.textContent = 'Checking…';
+  await unlock($('#pw').value, msg);
+});
+async function unlock(password, msg) {
+  try {
+    const m = await (await fetch('manifest.json', { cache: 'no-store' })).json();
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+    KEY = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: b64(m.salt), iterations: m.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    let cfg;
+    try { cfg = JSON.parse(new TextDecoder().decode(await dec(m.cfg))); }
+    catch (err) { msg.className = 'msg err'; msg.textContent = 'Wrong password.'; KEY = null; return false; }
+    $('#pw').value = '';
+    start(cfg);
+    sessionStorage.setItem('rk-pw', password);
+    return true;
+  } catch (err) { msg.className = 'msg err'; msg.textContent = 'Could not load. Check your connection and try again.'; return false; }
+}
+
+const VIDEOS = [{ v: 'top10', title: 'MODEL TOP 10' }, { v: 'agency', title: 'AGENCY TOP 5' }, { v: 'newface', title: 'NEW FACES BY AGENCY' }];
+const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const players = [];
+function openInSiteTab(url) {
+  const opened = window.open(url, '_blank');
+  if (!opened) location.href = url;
+}
+function currentCountryUrl(country, archived) {
+  const segments = location.pathname.split('/').filter(Boolean);
+  const depth = archived ? Math.max(3, segments.length) : Math.max(1, segments.length);
+  return `${'../'.repeat(depth)}${country}/`;
+}
+
+async function start(cfg) {
+  const embed = new URLSearchParams(location.search).get('embed') === '1';
+  $('#gate').hidden = true; $('#app').hidden = false;
+  const names = { kr:'KOREA', jp:'JAPAN', jpr:'JAPAN REGIONAL', cn:'CHINA', tw:'TAIWAN' };
+  const country = names[cfg.country] || String(cfg.country).toUpperCase();
+  const countryTitle = cfg.country === 'jpr' ? 'Japan Regional' : country[0] + country.slice(1).toLowerCase();
+  document.title = `${country} Model Ranking`;
+  $('#ttl').textContent = `${country} MODEL RANKING`;
+  const per = `${cfg.meta.window[0]} — ${cfg.meta.window[1]}`;
+  const source = cfg.country === 'jpr' ? 'Japan Regional New Faces & Jobs Tracker' : `${countryTitle} New Faces & Jobs Tracker`;
+  $('#hdr').textContent = `PERIOD ${per} · SOURCE ${source} · UPDATED ${cfg.meta.updated}`;
+  const archived = /\/archive\/[^/]+\/?$/.test(location.pathname);
+  $('#currentBtn').hidden = !archived;
+  $('#archiveBtn').hidden = archived;
+  const countrySwitch = $('#countrySwitch'); countrySwitch.replaceChildren();
+  Object.entries(names).forEach(([code, name]) => {
+    const button = document.createElement('button'); button.type = 'button'; button.textContent = name;
+    if (code === cfg.country) { button.setAttribute('aria-current', 'page'); button.disabled = true; }
+    else button.addEventListener('click', () => openInSiteTab(currentCountryUrl(code, archived)));
+    countrySwitch.append(button);
+  });
+  if (location.hash === '#archive') { $('#cards').hidden = true; $('#load').hidden = true; $('#archiveView').hidden = false; }
+  const archiveItems = (cfg.archive || []).slice().sort((a,b) => String(b.updated).localeCompare(String(a.updated)) || String(b.period_end).localeCompare(String(a.period_end)));
+  const archiveList = $('#archiveList');
+  if (!archiveItems.length) archiveList.innerHTML = '<div class="empty">No past editions yet.</div>';
+  else archiveItems.forEach((item) => {
+    const row = document.createElement('button'); row.type = 'button'; row.className = 'archive-row'; row.dataset.kind = item.kind;
+    const title = `PERIOD ${item.period_start} — ${item.period_end} · SOURCE ${source} · UPDATED ${item.updated}`;
+    row.innerHTML = `<span class="archive-title">${esc(title)}</span><span class="badge">${esc(String(item.kind).toUpperCase())}</span>`;
+    row.addEventListener('click', () => openInSiteTab(`./archive/${encodeURIComponent(item.slug)}/`)); archiveList.append(row);
+  });
+  // すべてのファイルを元に戻して、ブラウザの中だけの URL にする
+  const RES = {}; const keys = Object.keys(cfg.res); let n = 0;
+  try {
+    await Promise.all(keys.map(async (k) => {
+      const r = cfg.res[k];
+      RES[k] = URL.createObjectURL(new Blob([await dec(r.bin)], { type: r.type }));
+      $('#load').textContent = `Preparing videos… ${++n} / ${keys.length}`;
+    }));
+  } catch (err) { $('#load').textContent = 'Could not load a file. Please reload the page.'; return; }
+  const fontFaces = [
+    new FontFace('Archivo Black', `url("${RES['../assets/fonts/ArchivoBlack-Regular.ttf']}")`),
+    new FontFace('Bebas Neue', `url("${RES['../assets/fonts/BebasNeue-Regular.ttf']}")`),
+    new FontFace('Barlow Condensed', `url("${RES['../assets/fonts/BarlowCondensed-Bold.ttf']}")`)
+  ];
+  try { await Promise.all(fontFaces.map(async (font) => document.fonts.add(await font.load()))); } catch (err) {}
+  const head = (q) => `<script>window.__RES=${JSON.stringify(RES)};window.__Q=${JSON.stringify(q)};<\/script>`;
+  if (embed) {
+    let embedNextRequested = false;
+    addEventListener('message', (e) => { if (e.origin === location.origin && e.source === parent && e.data?.type === 'rk-next') embedNextRequested = true; });
+    const requested = new URLSearchParams(location.search).get('v');
+    if (!VIDEOS.some((x) => x.v === requested)) return;
+    document.body.innerHTML = '<div id="embed-frame" style="position:fixed;inset:0;background:#000;overflow:hidden"></div>';
+    const vh = cfg.video_html.replace(/<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/gsap@[^\"]+"[^>]*><\/script>/, `<script src="${RES['../assets/vendor/gsap.min.js']}"><\/script>`);
+    const html = vh.replace('<head>', '<head>' + head(`c=${cfg.country}&v=${requested}&month=${cfg.month}&autoplay=1`));
+    const frame = document.createElement('iframe'); frame.title = 'Ranking video'; frame.allow = 'autoplay'; frame.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0';
+    $('#embed-frame').append(frame); frame.src = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    const timer = setInterval(() => {
+      try {
+        const w = frame.contentWindow, tl = w.__tl;
+        if (!tl) return;
+        if (tl.progress() >= 1) {
+          clearInterval(timer);
+          parent.postMessage({ type: 'rk-ended' }, location.origin);
+          setTimeout(() => { if (!embedNextRequested) { tl.restart(); setInterval(() => { try { const w = frame.contentWindow; if (w.__tl && !w.__tl.paused()) w.document.querySelectorAll('video').forEach((v) => v.closest('.layer')?.style.visibility === 'visible' ? v.play().catch(() => {}) : v.pause()); } catch (err) {} }, 200); } }, 300);
+          return;
+        }
+        w.document.querySelectorAll('video').forEach((v) => v.closest('.layer')?.style.visibility === 'visible' ? v.play().catch(() => {}) : v.pause());
+        if (tl.paused()) { tl.play(); return; }
+      } catch (err) {}
+    }, 200);
+    return;
+  }
+  $('#load').hidden = true;
+  VIDEOS.forEach((x) => {
+    const s = cfg.meta.sheets[x.v];
+    const c = document.createElement('section'); c.className = 'card';
+    const labels = { top10:'MODEL TOP 10', agency:'AGENCY TOP 5', newface:'NEW FACES BY AGENCY' };
+    c.innerHTML = `<h3><span class="dot" style="background:${esc(cfg.meta.colors[x.v])}"></span>${labels[x.v]}</h3>
+      <div class="frame"><iframe title="${labels[x.v]}"></iframe></div>
+      <div class="ctrl"><button class="pp" type="button" aria-label="Play or pause ${labels[x.v]}">▶</button><input type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek ${labels[x.v]}"><span class="t">0:00 / 0:00</span></div>
+      <div class="info">SOURCE SHEET: ${esc(s.sheet)} · PERIOD ${esc(per)}<br><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">OPEN SOURCE SHEET (GOOGLE DRIVE)</a></div>`;
+    $('#cards').append(c);
+    // GSAP は同梱したものを使う(外部 CDN が使えなくても動く)
+    const vh = cfg.video_html.replace(/<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/gsap@[^"]+"[^>]*><\/script>/, `<script src="${RES['../assets/vendor/gsap.min.js']}"><\/script>`);
+    const html = vh.replace('<head>', '<head>' + head(`c=${cfg.country}&v=${x.v}&month=${cfg.month}&autoplay=0`));
+  const p = { ...x, ifr: c.querySelector('iframe'), range: c.querySelector('input'), t: c.querySelector('.t'), pp: c.querySelector('.pp'), looping: false };
+    p.ifr.src = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+    p.tl = () => { try { return p.ifr.contentWindow.__tl; } catch (e) { return null; } };
+    addEventListener('message', (e) => { if (e.source === p.ifr.contentWindow && e.data?.type === 'video-ready') { const tl = p.tl(); if (tl) tl.eventCallback('onComplete', () => { if (p.looping) { tl.restart(); syncVideos(p, true); } }); } });
+    p.pp.onclick = () => { const tl = p.tl(); if (!tl) return; tl.paused() ? play(p) : stop(p); };
+    p.range.oninput = () => { const w = p.ifr.contentWindow; if (!w || !w.__seekFrame) return; w.__seekFrame(+p.range.value); p.pp.textContent = '▶'; };
+    players.push(p);
+  });
+}
+function syncVideos(p, playing) {
+  const w = p.ifr.contentWindow; if (!w) return;
+  w.document.querySelectorAll('video').forEach((v) => playing && v.closest('.layer').style.visibility === 'visible' ? v.play().catch(() => {}) : v.pause());
+}
+function play(p) { const tl = p.tl(); if (!tl) return; p.looping = true; if (tl.progress() >= 1) tl.seek(0); tl.play(); syncVideos(p, true); p.pp.textContent = '❚❚'; }
+function stop(p) { const tl = p.tl(); if (!tl) return; p.looping = false; tl.pause(); syncVideos(p, false); p.pp.textContent = '▶'; }
+addEventListener('message', (e) => {
+  if (!e.data || e.data.type !== 'video-ready') return;
+  const p = players.find((x) => x.v === e.data.v); if (p) p.range.max = e.data.duration;
+});
+setInterval(() => players.forEach((p) => {
+  const tl = p.tl(); if (!tl) return;
+  if (!tl.paused()) p.range.value = tl.time();
+  p.t.textContent = `${fmt(tl.time())} / ${fmt(tl.duration())}`;
+  if (tl.progress() >= 1) p.pp.textContent = '▶';
+}), 200);
+$('#playAll').onclick = () => players.forEach(play);
+$('#stopAll').onclick = () => players.forEach(stop);
+$('#archiveBtn').onclick = () => openInSiteTab(`${location.pathname}#archive`);
+$('#backBtn').onclick = () => { $('#archiveView').hidden = true; $('#cards').hidden = false; };
+$('#currentBtn').onclick = () => openInSiteTab(currentCountryUrl(location.pathname.split('/').filter(Boolean)[0], true));
+const savedPassword = sessionStorage.getItem('rk-pw');
+if (new URLSearchParams(location.search).get('embed') === '1' && !savedPassword) { parent.postMessage({ type: 'rk-locked' }, location.origin); document.body.replaceChildren(); }
+else if (savedPassword) unlock(savedPassword, $('#msg'));
+</script>
+</body>
+</html>
